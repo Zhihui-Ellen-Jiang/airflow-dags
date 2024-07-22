@@ -13,12 +13,14 @@ default_args = {
     'retry_delay': timedelta(minutes=1),
 }
 
+dag_id = 'example_dag_5'
+
 dag = DAG(
-    'example_dag_5',
+    dag_id,
     default_args=default_args,
     description='A simple example DAG with 100 tasks',
-    schedule_interval=timedelta(days=1),
-    max_active_runs=1,
+    schedule_interval=timedelta(minutes=10),  # Schedule every 10 minutes
+    max_active_runs=1,  # Adjust if you want more concurrent runs
 )
 
 start = DummyOperator(
@@ -29,7 +31,7 @@ start = DummyOperator(
 tasks = []
 for i in range(1, 101):
     task = DummyOperator(
-        task_id=f'task_{i}',
+        task_id=f'task_{{i}}',
         dag=dag,
     )
     tasks.append(task)
