@@ -31,7 +31,7 @@ start = DummyOperator(
 tasks = []
 for i in range(1, 101):
     task = DummyOperator(
-        task_id=f'task_{{i}}',
+        task_id=f'task_{i}',
         dag=dag,
     )
     tasks.append(task)
