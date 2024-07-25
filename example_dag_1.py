@@ -1,47 +1,56 @@
-
 from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
+import time
+import requests
 
+# Define the benchmark function
+def benchmark(*args):
+    try:
+        r = requests.get("https://www.salesforce.com", timeout=10)  # Add a timeout to the request
+        print(r.text[:100])  # Print the first 100 characters for brevity
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+    time.sleep(60)  # Sleep for 60 seconds to simulate a delay
+
+# Define default arguments for the DAG
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2023, 1, 1),
+    'start_date': datetime(2022, 2, 22),
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=1),
 }
 
-dag_id = 'example_dag_1'
-
+# Create a single DAG
+dag_id = 'benchmark_regular'
 dag = DAG(
     dag_id,
     default_args=default_args,
-    description='A simple example DAG with 100 tasks',
-    schedule_interval=timedelta(minutes=10),  # Schedule every 10 minutes
-    max_active_runs=1,  # Adjust if you want more concurrent runs
+    description='A simple DAG with benchmark tasks',
+    schedule_interval=None,  # No schedule, can be triggered manually
+    max_active_runs=1
 )
 
-start = DummyOperator(
-    task_id='start',
-    dag=dag,
-)
+# Create tasks
+start = DummyOperator(task_id='start', dag=dag)
 
-tasks = []
-for i in range(1, 101):
-    task = DummyOperator(
-        task_id=f'task_{{i}}',
-        dag=dag,
+benchmark_tasks = []
+for i in range(1, 11):
+    task = PythonOperator(
+        task_id=f'benchmark_{i}',
+        python_callable=benchmark,
+        dag=dag
     )
-    tasks.append(task)
+    benchmark_tasks.append(task)
 
-end = DummyOperator(
-    task_id='end',
-    dag=dag,
-)
+end = DummyOperator(task_id='end', dag=dag)
 
-start >> tasks[0]
-for i in range(99):
-    tasks[i] >> tasks[i + 1]
-tasks[-1] >> end
+# Set task dependencies
+start >> benchmark_tasks[0]
+for i in range(len(benchmark_tasks) - 1):
+    benchmark_tasks[i] >> benchmark_tasks[i + 1]
+benchmark_tasks[-1] >> end
