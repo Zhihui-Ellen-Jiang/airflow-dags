@@ -78,7 +78,7 @@ def create_dag(dag_id,
 
     return dag
 # build a dag for each number in range(10)
-for n in range(1, 401):
+for n in range(1, 5):
     dag_id = 'benchmark_regular_{}'.format(str(n))
 
     default_args = {'owner': 'airflow',
