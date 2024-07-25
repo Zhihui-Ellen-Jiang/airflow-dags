@@ -6,12 +6,13 @@ import time
 import requests
 
 def benchmark(*args):
-    try:
-        r = requests.get("https://www.salesforce.com", timeout=10)  # Add a timeout to the request
-        print(r.text[:100])  # Print the first 100 characters for brevity
-    except requests.RequestException as e:
-        print(f"Request failed: {e}")
-    time.sleep(60)  # Sleep for 60 seconds to simulate a delay
+    print("Hello World")
+    # try:
+    #     r = requests.get("https://www.salesforce.com", timeout=10)  # Add a timeout to the request
+    #     print(r.text[:100])  # Print the first 100 characters for brevity
+    # except requests.RequestException as e:
+    #     print(f"Request failed: {e}")
+    # time.sleep(60)  # Sleep for 60 seconds to simulate a delay
 
 # Define default arguments
 default_args = {
