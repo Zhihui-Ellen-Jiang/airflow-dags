@@ -1,47 +1,94 @@
 
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
-from datetime import datetime, timedelta
+from airflow.operators.python_operator import PythonOperator
+from airflow.operators.dummy import DummyOperator
+from datetime import datetime
+import time
+import requests
 
-default_args = {
-    'owner': 'airflow',
-    'depends_on_past': False,
-    'start_date': datetime(2023, 1, 1),
-    'email_on_failure': False,
-    'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=1),
-}
 
-dag_id = 'example_dag_14'
+def create_dag(dag_id,
+               schedule,
+               dag_number,
+               default_args):
 
-dag = DAG(
-    dag_id,
-    default_args=default_args,
-    description='A simple example DAG with 100 tasks',
-    schedule_interval=timedelta(minutes=10),  # Schedule every 10 minutes
-    max_active_runs=1,  # Adjust if you want more concurrent runs
-)
+    def benchmark(*args):
 
-start = DummyOperator(
-    task_id='start',
-    dag=dag,
-)
+        r = requests.get("https://www.salesforce.com")
+        print(r.text)
+        time.sleep(60)
 
-tasks = []
-for i in range(1, 101):
-    task = DummyOperator(
-        task_id=f'task_{i}',
-        dag=dag,
-    )
-    tasks.append(task)
+    dag = DAG(dag_id,
+              schedule_interval=schedule,
+              default_args=default_args)
 
-end = DummyOperator(
-    task_id='end',
-    dag=dag,
-)
+    start = DummyOperator(task_id='start', retries = 3, dag=dag)
+    t1 = PythonOperator(
+        task_id='benchmark_1',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t2 = PythonOperator(
+        task_id='benchmark_2',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t3 = PythonOperator(
+        task_id='benchmark_3',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t4 = PythonOperator(
+        task_id='benchmark_4',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t5 = PythonOperator(
+        task_id='benchmark_5',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t6 = PythonOperator(
+        task_id='benchmark_6',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t7 = PythonOperator(
+        task_id='benchmark_7',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t8 = PythonOperator(
+        task_id='benchmark_8',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t9 = PythonOperator(
+        task_id='benchmark_9',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    t10 = PythonOperator(
+        task_id='benchmark_10',
+        retries = 3,
+        python_callable=benchmark,
+        dag=dag)
+    end = DummyOperator(task_id='end', retries = 3, dag=dag)
+    start >> t1 >> t2 >> t3 >> t4 >> t5 >> t6 >> t7 >> t8 >> t9 >> t10 >> end
 
-start >> tasks[0]
-for i in range(99):
-    tasks[i] >> tasks[i + 1]
-tasks[-1] >> end
+    return dag
+# build a dag for each number in range(10)
+for n in range(1, 401):
+    dag_id = 'benchmark_regular_{}'.format(str(n))
+
+    default_args = {'owner': 'airflow',
+                    'start_date': datetime(2022, 2, 22)
+                    }
+
+    schedule = None
+    dag_number = n
+
+    globals()[dag_id] = create_dag(dag_id,
+                                  schedule,
+                                  dag_number,
+                                  default_args)
