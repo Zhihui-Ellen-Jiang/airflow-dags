@@ -14,22 +14,12 @@ def create_dag(dag_id,
                default_args):
 
     def benchmark(*args):
-        url = "https://www.salesforce.com"
         try:
-            print(f"Making a request to {url}")
-            response = requests.get(url, timeout=10)  # Add a timeout to the request
-            response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
-            print(f"Response status code: {response.status_code}")
-            print(response.text[:200])  # Print the first 200 characters of the response text for brevity
-        except Timeout:
-            print(f"Request to {url} timed out.")
-        except HTTPError as http_err:
-            print(f"HTTP error occurred: {http_err}")
-        except ConnectionError:
-            print(f"Failed to connect to {url}")
-        except RequestException as req_err:
-            print(f"Request failed: {req_err}")
-        time.sleep(10)  # Reduced sleep time for local testing
+            # r = requests.get("https://www.salesforce.com", timeout=10)  # Add a timeout to the request
+            print("Hello World")
+        except RequestException as e:
+            print(f"Request failed: {e}")
+        time.sleep(5)  # Reduced sleep time for local testing
 
     dag = DAG(dag_id,
               schedule_interval=schedule,
