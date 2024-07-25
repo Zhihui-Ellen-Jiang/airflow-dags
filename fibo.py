@@ -3,16 +3,20 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
 import time
-import requests
+
 
 # Define the benchmark function
 def benchmark(*args):
-    try:
-        r = requests.get("https://www.salesforce.com", timeout=10)  # Add a timeout to the request
-        print(r.text[:100])  # Print the first 100 characters for brevity
-    except requests.RequestException as e:
-        print(f"Request failed: {e}")
+    def fibonacci(n):
+        if n <= 1:
+            return n
+        else:
+            return fibonacci(n - 1) + fibonacci(n - 2)
+
+    result = fibonacci(30)  # Adjust the number for a reasonable workload
+    print(f"Fibonacci result: {result}")
     time.sleep(60)  # Sleep for 60 seconds to simulate a delay
+
 
 # Define default arguments for the DAG
 default_args = {
