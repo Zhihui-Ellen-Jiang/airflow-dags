@@ -15,7 +15,7 @@ def benchmark(*args):
 
     result = fibonacci(30)  # Adjust the number for a reasonable workload
     print(f"Fibonacci result: {result}")
-    time.sleep(60)  # Sleep for 60 seconds to simulate a delay
+    time.sleep(15)  # Sleep for 60 seconds to simulate a delay
 
 
 # Define default arguments for the DAG
