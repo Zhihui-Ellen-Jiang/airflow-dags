@@ -42,6 +42,6 @@ end = DummyOperator(
 )
 
 start >> tasks[0]
-for i in range(10):
+for i in range(99):
     tasks[i] >> tasks[i + 1]
 tasks[-1] >> end
