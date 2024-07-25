@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
 
-default_args = {{
+default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
     'start_date': datetime(2023, 1, 1),
@@ -11,7 +11,7 @@ default_args = {{
     'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=1),
-}}
+}
 
 dag_id = 'example_dag_11'
 
