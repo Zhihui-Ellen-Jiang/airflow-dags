@@ -5,6 +5,7 @@ from airflow.operators.dummy import DummyOperator
 from datetime import datetime
 import time
 import requests
+from requests import RequestException
 
 
 def create_dag(dag_id,
@@ -13,10 +14,12 @@ def create_dag(dag_id,
                default_args):
 
     def benchmark(*args):
-
-        r = requests.get("https://www.salesforce.com")
-        print(r.text)
-        time.sleep(60)
+        try:
+            r = requests.get("https://www.salesforce.com", timeout=10)  # Add a timeout to the request
+            print(r.text)
+        except RequestException as e:
+            print(f"Request failed: {e}")
+        time.sleep(5)  # Reduced sleep time for local testing
 
     dag = DAG(dag_id,
               schedule_interval=schedule,
