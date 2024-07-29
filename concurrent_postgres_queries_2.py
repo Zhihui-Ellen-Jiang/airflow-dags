@@ -16,13 +16,13 @@ default_args = {
 
 # Create a single DAG
 dag = DAG(
-    dag_id='concurrent_airflow_postgres_queries',
+    dag_id='concurrent_postgres_queries_2',
     default_args=default_args,
     description='A DAG to run multiple PostgreSQL queries on Airflow metadata database concurrently',
     schedule_interval=None,  # No schedule, can be triggered manually
     max_active_runs=1,
     catchup=False,
-    concurrency=10  # Allow up to 10 tasks to run concurrently
+    concurrency=20  # Allow up to 20 tasks to run concurrently
 )
 
 # Create start task
@@ -34,12 +34,22 @@ queries = [
     "SELECT AVG(duration) FROM task_instance WHERE duration IS NOT NULL;",
     "SELECT MAX(start_date) FROM task_instance;",
     "SELECT MIN(end_date) FROM task_instance;",
-    "SELECT dag_id, execution_date FROM task_instance WHERE state = 'success';",
+    "SELECT * FROM connection LIMIT 10;",
     "SELECT MIN(end_date) FROM task_instance;",
     "SELECT COUNT(*) FROM dag;",
     "SELECT * FROM connection LIMIT 10;",
     "SELECT * FROM connection LIMIT 10;",
-    "SELECT * FROM xcom WHERE LIMIT 10;"
+    "SELECT * FROM connection LIMIT 10;",
+    "SELECT COUNT(*) FROM dag;",
+    "SELECT AVG(duration) FROM task_instance WHERE duration IS NOT NULL;",
+    "SELECT MAX(start_date) FROM task_instance;",
+    "SELECT MIN(end_date) FROM task_instance;",
+    "SELECT * FROM connection LIMIT 10;",
+    "SELECT MIN(end_date) FROM task_instance;",
+    "SELECT COUNT(*) FROM dag;",
+    "SELECT * FROM connection LIMIT 10;",
+    "SELECT * FROM connection LIMIT 10;",
+    "SELECT * FROM connection LIMIT 10;"
 ]
 
 # Create Postgres tasks
