@@ -16,7 +16,7 @@ default_args = {
 
 # Create a single DAG
 dag = DAG(
-    'high_concurrency_postgres_queries',
+    'high_concurrency_postgres_queries_1',
     default_args=default_args,
     description='A DAG to create high number of PostgreSQL connections concurrently',
     schedule_interval=None,  # No schedule, can be triggered manually
