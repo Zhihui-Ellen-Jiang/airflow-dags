@@ -30,7 +30,7 @@ default_args = {
 }
 
 # Create a single DAG
-dag_id = 'benchmark_regular_1'
+dag_id = 'benchmark_regular_19'
 dag = DAG(
     dag_id,
     default_args=default_args,
