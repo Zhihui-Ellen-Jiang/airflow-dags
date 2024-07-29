@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
-from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.providers.postgres.operators.postgres import SQLExecuteQueryOperator
 from datetime import datetime, timedelta
 
 # Define default arguments for the DAG
@@ -30,9 +30,9 @@ start = DummyOperator(task_id='start', dag=dag)
 query = "SELECT 1;"
 
 # Create Postgres task
-postgres_task = PostgresOperator(
+postgres_task = SQLExecuteQueryOperator(
     task_id='test_postgres_query',
-    postgres_conn_id='postgres_default',  # Connection ID set up in Airflow
+    conn_id='postgres_default',  # Connection ID set up in Airflow
     sql=query,
     dag=dag
 )
