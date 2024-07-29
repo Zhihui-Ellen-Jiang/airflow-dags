@@ -36,7 +36,7 @@ postgres_tasks = []
 for i in range(1, 101):
     task = PostgresOperator(
         task_id=f'postgres_query_{i}',
-        postgres_conn_id='postgres_default',  # Connection ID set up in Airflow
+        postgres_conn_id='pgbouncer_default',  # Connection ID set up in Airflow
         sql=query,
         dag=dag
     )
