@@ -47,6 +47,7 @@ postgres_tasks = []
 for i, query in enumerate(queries):
     task = PostgresOperator(
         task_id=f'postgres_query_{i + 1}',
+        postgres_conn_id='postgres_default',
         sql=query,
         dag=dag
     )
