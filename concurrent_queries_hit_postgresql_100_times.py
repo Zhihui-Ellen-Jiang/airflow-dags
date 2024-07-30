@@ -22,7 +22,7 @@ def complex_algorithm(**kwargs):
         "SELECT COUNT(*) FROM dag;",
         "SELECT AVG(duration) FROM task_instance WHERE duration IS NOT NULL;",
         "SELECT MAX(start_date) FROM task_instance;"
-    ] * 100 # Repeat the list to make it 100 queries
+    ] * 500 # Repeat the list to make it 100 queries
 
     # Function to run a single query
     def run_query(query):
