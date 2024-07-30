@@ -23,11 +23,15 @@ def hit_postgresql_100_times(**kwargs):
         "SELECT COUNT(*) FROM dag;"
     ] * 100  # Repeat the list to make it 1000 queries
 
-    # Execute each query 10 times (total 100 queries)
-    for i in range(10):
-        for query in queries:
-            pg_hook.run(query)
-            print(f"Executed query: {query}")
+    # Function to run a single query
+    def run_query(query):
+        pg_hook.run(query)
+        print(f"Executed query: {query}")
+
+    # Use ThreadPoolExecutor to run queries concurrently
+    with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+        executor.map(run_query, queries)
+
 
 # Define default arguments for the DAG
 default_args = {
