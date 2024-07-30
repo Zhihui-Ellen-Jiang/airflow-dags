@@ -46,7 +46,7 @@ default_args = {
 
 # Create the DAG
 dag = DAG(
-    'concurrent_queries_hit_postgresql_100_times_3',
+    'concurrent_queries_hit_postgresql_100_times_5',
     default_args=default_args,
     description='A DAG with one task hitting PostgreSQL 100 times with concurrent queries',
     schedule_interval=None,  # No schedule, can be triggered manually
