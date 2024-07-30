@@ -3,25 +3,26 @@ from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from datetime import datetime, timedelta
+import concurrent.futures
 
-# Define the function to hit the PostgreSQL database 100 times
-def hit_postgresql_100_times(**kwargs):
+# Define the function to hit the PostgreSQL database 100 times with complex queries
+def complex_algorithm(**kwargs):
     # Get the PostgreSQL connection from Airflow
     pg_hook = PostgresHook(postgres_conn_id='postgres_default')
     
     # Define a list of meaningful SQL queries
     queries = [
+        "INSERT INTO test_table (name, value) VALUES ('test', 100);",
+        "SELECT COUNT(*) FROM test_table;",
+        "UPDATE test_table SET value = value + 1 WHERE name = 'test';",
+        "DELETE FROM test_table WHERE value > 110;",
+        "SELECT pg_sleep(1);",  # Adding a sleep to simulate longer query time
         "SELECT MIN(end_date) FROM task_instance;",
         "SELECT * FROM connection LIMIT 10;",
-        "SELECT MIN(end_date) FROM task_instance;",
         "SELECT COUNT(*) FROM dag;",
         "SELECT AVG(duration) FROM task_instance WHERE duration IS NOT NULL;",
-        "SELECT MAX(start_date) FROM task_instance;",
-        "SELECT MIN(end_date) FROM task_instance;",
-        "SELECT * FROM connection LIMIT 10;",
-        "SELECT MIN(end_date) FROM task_instance;",
-        "SELECT COUNT(*) FROM dag;"
-    ] * 100  # Repeat the list to make it 1000 queries
+        "SELECT MAX(start_date) FROM task_instance;"
+    ] * 100 # Repeat the list to make it 100 queries
 
     # Function to run a single query
     def run_query(query):
@@ -31,7 +32,6 @@ def hit_postgresql_100_times(**kwargs):
     # Use ThreadPoolExecutor to run queries concurrently
     with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
         executor.map(run_query, queries)
-
 
 # Define default arguments for the DAG
 default_args = {
@@ -46,11 +46,13 @@ default_args = {
 
 # Create the DAG
 dag = DAG(
-    'single_task_hit_postgresql_100_times',
+    'concurrent_queries_hit_postgresql_100_times',
     default_args=default_args,
-    description='A DAG with one task hitting PostgreSQL 100 times',
+    description='A DAG with one task hitting PostgreSQL 100 times with concurrent queries',
     schedule_interval=None,  # No schedule, can be triggered manually
     catchup=False,
+    max_active_runs=1,
+    concurrency=100  # Allow up to 100 tasks to run concurrently
 )
 
 # Create start and end tasks
@@ -60,7 +62,7 @@ end = DummyOperator(task_id='end', dag=dag)
 # Create the main task
 hit_postgresql_task = PythonOperator(
     task_id='hit_postgresql_100_times',
-    python_callable=hit_postgresql_100_times,
+    python_callable=complex_algorithm,
     provide_context=True,
     dag=dag,
 )
