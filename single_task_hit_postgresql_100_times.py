@@ -21,7 +21,7 @@ def hit_postgresql_100_times(**kwargs):
         "SELECT * FROM connection LIMIT 10;",
         "SELECT MIN(end_date) FROM task_instance;",
         "SELECT COUNT(*) FROM dag;"
-    ]
+    ] * 100  # Repeat the list to make it 1000 queries
 
     # Execute each query 10 times (total 100 queries)
     for i in range(10):
