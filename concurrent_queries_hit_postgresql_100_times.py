@@ -12,16 +12,16 @@ def complex_algorithm(**kwargs):
     
     # Define a list of meaningful SQL queries
     queries = [
-        "INSERT INTO test_table (name, value) VALUES ('test', 100);",
-        "SELECT COUNT(*) FROM test_table;",
-        "UPDATE test_table SET value = value + 1 WHERE name = 'test';",
-        "DELETE FROM test_table WHERE value > 110;",
-        "SELECT pg_sleep(1);",  # Adding a sleep to simulate longer query time
-        "SELECT MIN(end_date) FROM task_instance;",
-        "SELECT * FROM connection LIMIT 10;",
+        "SELECT AVG(duration) FROM task_instance WHERE duration IS NOT NULL;",
+        "SELECT pg_sleep(5);",  # Adding a sleep to simulate longer query time
         "SELECT COUNT(*) FROM dag;",
         "SELECT AVG(duration) FROM task_instance WHERE duration IS NOT NULL;",
-        "SELECT MAX(start_date) FROM task_instance;"
+        "SELECT MAX(start_date) FROM task_instance;",
+        "SELECT MIN(end_date) FROM task_instance;",
+        "SELECT * FROM connection LIMIT 10;",
+        "SELECT MIN(end_date) FROM task_instance;",
+        "SELECT COUNT(*) FROM dag;",
+        "SELECT * FROM connection LIMIT 10;"
     ] * 500 # Repeat the list to make it 100 queries
 
     # Function to run a single query
