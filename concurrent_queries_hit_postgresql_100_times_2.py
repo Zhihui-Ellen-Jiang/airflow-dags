@@ -30,7 +30,7 @@ def complex_algorithm(**kwargs):
         print(f"Executed query: {query}")
 
     # Use ThreadPoolExecutor to run queries concurrently
-    with concurrent.futures.ThreadPoolExecutor(max_workers=120) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
         executor.map(run_query, queries)
 
 # Define default arguments for the DAG
