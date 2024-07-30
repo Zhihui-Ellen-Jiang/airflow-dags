@@ -8,7 +8,7 @@ import concurrent.futures
 # Define the function to hit the PostgreSQL database 100 times with complex queries
 def complex_algorithm(**kwargs):
     # Get the PostgreSQL connection from Airflow
-    pg_hook = PostgresHook(postgres_conn_id='postgres_default')
+    pg_hook = PostgresHook(postgres_conn_id='pgbouncer_default')
     
     # Define a list of meaningful SQL queries
     queries = [
