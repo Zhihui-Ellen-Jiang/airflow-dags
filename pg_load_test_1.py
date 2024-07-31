@@ -8,21 +8,85 @@ import concurrent.futures
 # Define the function to hit the PostgreSQL database 100 times with complex queries
 def complex_algorithm(**kwargs):
     # Get the PostgreSQL connection from Airflow
-    pg_hook = PostgresHook(postgres_conn_id='postgres_default')
+    pg_hook = PostgresHook(postgres_conn_id='pgbouncer_default')
     
     # Define a list of meaningful SQL queries
     queries = [
-        "WITH RECURSIVE t(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM t WHERE n < 1000) SELECT COUNT(*) FROM t;",
-        "WITH RECURSIVE t(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM t WHERE n < 1000) SELECT n, pg_sleep(0.01) FROM t;",
-        "SELECT generate_series(1, 1000) AS series;",
-        "SELECT COUNT(*), AVG(duration), MAX(duration), MIN(duration) FROM task_instance;",
-        "SELECT * FROM connection ORDER BY connection_id DESC LIMIT 50;",
-        "SELECT task_id, COUNT(*), AVG(duration) FROM task_instance GROUP BY task_id ORDER BY AVG(duration) DESC LIMIT 10;",
-        "SELECT dag_id, COUNT(*), MAX(duration) FROM task_instance GROUP BY dag_id HAVING COUNT(*) > 10;",
-        "SELECT * FROM connection WHERE connection_id IN (SELECT connection_id FROM connection ORDER BY connection_id DESC LIMIT 10);",
-        "WITH RECURSIVE cte AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM cte WHERE n < 1000) SELECT n, pg_sleep(0.01) FROM cte;",
-        "SELECT pg_advisory_lock(1); SELECT pg_advisory_unlock(1);"
-    ] * 500 # Repeat the list to make it 100 queries
+        """
+        WITH RECURSIVE t(n) AS (
+            SELECT 1
+            UNION ALL
+            SELECT n + 1 FROM t WHERE n < 1000
+        )
+        SELECT COUNT(*), SUM(n), AVG(n), MAX(n), MIN(n) FROM t;
+        """,
+        """
+        WITH RECURSIVE t(n) AS (
+            SELECT 1
+            UNION ALL
+            SELECT n + 1 FROM t WHERE n < 1000
+        )
+        SELECT n, pg_sleep(0.01) FROM t ORDER BY n DESC;
+        """,
+        """
+        SELECT generate_series(1, 1000) AS series, md5(random()::text) 
+        FROM generate_series(1, 1000)
+        JOIN (SELECT generate_series(1, 1000) AS series2) AS t2 ON series = t2.series2;
+        """,
+        """
+        SELECT COUNT(*), AVG(duration), MAX(duration), MIN(duration), STDDEV(duration) 
+        FROM task_instance 
+        WHERE execution_date > now() - interval '1 day';
+        """,
+        """
+        SELECT c.*, t1.*, t2.*
+        FROM connection c
+        JOIN task_instance t1 ON c.connection_id = t1.connection_id
+        JOIN dag_run t2 ON t1.dag_id = t2.dag_id
+        ORDER BY c.connection_id DESC LIMIT 50;
+        """,
+        """
+        SELECT task_id, COUNT(*), AVG(duration), STDDEV(duration)
+        FROM task_instance
+        GROUP BY task_id
+        HAVING COUNT(*) > 5
+        ORDER BY AVG(duration) DESC LIMIT 10;
+        """,
+        """
+        SELECT dag_id, COUNT(*), MAX(duration), MIN(duration), AVG(duration), STDDEV(duration)
+        FROM task_instance
+        GROUP BY dag_id
+        HAVING COUNT(*) > 10
+        ORDER BY AVG(duration) DESC;
+        """,
+        """
+        SELECT * 
+        FROM connection 
+        WHERE connection_id IN (
+            SELECT connection_id 
+            FROM connection 
+            ORDER BY connection_id DESC LIMIT 10
+        );
+        """,
+        """
+        WITH RECURSIVE cte AS (
+            SELECT 1 AS n
+            UNION ALL
+            SELECT n + 1 FROM cte WHERE n < 1000
+        )
+        SELECT n, pg_sleep(0.01), md5(random()::text)
+        FROM cte
+        ORDER BY n DESC;
+        """,
+        """
+        DO $$ 
+        BEGIN 
+            PERFORM pg_advisory_lock(1);
+            PERFORM pg_sleep(0.5);
+            PERFORM pg_advisory_unlock(1);
+        END $$;
+        """
+    ] * 300  # Repeat the list to make it 1
 
     # Function to run a single query
     def run_query(query):
