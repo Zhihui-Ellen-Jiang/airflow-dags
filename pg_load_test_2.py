@@ -86,7 +86,7 @@ def complex_algorithm(**kwargs):
             PERFORM pg_advisory_unlock(1);
         END $$;
         """
-    ] * 300  # Repeat the list to make it 1
+    ] * 500  # Repeat the list to make it 1
 
     # Function to run a single query
     def run_query(query):
