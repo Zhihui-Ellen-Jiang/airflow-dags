@@ -22,8 +22,8 @@ def complex_algorithm(**kwargs):
         "SELECT MIN(end_date) FROM task_instance;",
         "SELECT COUNT(*) FROM dag;",
         "SELECT * FROM connection LIMIT 10;"
-    ] * 500 # Repeat the list to make it 100 queries
-
+    ] * 500 
+    
     # Function to run a single query
     def run_query(query):
         pg_hook.run(query)
